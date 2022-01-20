@@ -1,36 +1,52 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Test {
-    private List input;
-    private List expected;
-    private List actual;
+    private int input[];
+    private int expected[];
+    private int actual[];
     private Boolean pass;
 
-    public Test (List input, List expected) {
-        this.input = new ArrayList<>(input);
+    public Test (int input[], int expected[]) {
+        this.input = input;
         this.expected = expected;
-        InsertionSort insertionSort = new InsertionSort(input);
-        this.actual = insertionSort.getSorted();
-        this.pass = (actual.equals(expected) ? true : false);
+    }
+
+    public Test insertionSortTest() {
+        int[] inputCopy = new int[input.length];
+        System.arraycopy(input, 0, inputCopy, 0, input.length);
+        int[] insertionSort = new InsertionSort().sort(inputCopy);
+        this.actual = insertionSort;
+        this.pass = (Arrays.equals(actual,expected) ? true : false);
+        return this;
+    }
+
+    public Test mergeSortTest() {
+        int[] inputCopy = new int[input.length];
+        System.arraycopy(input, 0, inputCopy, 0, input.length);
+        int[] mergeSort = new MergeSort().sort(inputCopy,0,inputCopy.length-1);
+        this.actual = mergeSort;
+        this.pass = (Arrays.equals(actual,expected) ? true : false);
+        return this;
     }
 
     public String toString() {
         String passFail = pass ? "✅" : "❌";
-        String baseOutput = "Input: " + input + ". Output: " + actual;
+        String baseOutput = "Input: " + Arrays.toString(input) + ". Output: " + Arrays.toString(actual);
         return passFail + " " + baseOutput;
     }
 
-    public List getInput() {
+    public int[] getInput() {
         return input;
     }
 
-    public List getExpected() {
+    public int[] getExpected() {
         return expected;
     }
 
-    public List getActual() {
+    public int[] getActual() {
         return actual;
     }
 
