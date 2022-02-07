@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CS5329_Proj_1/CS5329_Proj_1.iml" filepath="$PROJECT_DIR$/CS5329_Proj_1/CS5329_Proj_1.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CS5329_Proj_2/CS5329_Proj_2.iml" filepath="$PROJECT_DIR$/CS5329_Proj_2/CS5329_Proj_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/CS5329_Proj_1/CS5329_Proj_1.iml" filepath="$PROJECT_DIR$/src/CS5329_Proj_1/CS5329_Proj_1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/CS5329_Proj_2/CS5329_Proj_2.iml" filepath="$PROJECT_DIR$/src/CS5329_Proj_2/CS5329_Proj_2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/cs5329-algos.iml" filepath="$PROJECT_DIR$/.idea/cs5329-algos.iml" />
     </modules>
   </component>
