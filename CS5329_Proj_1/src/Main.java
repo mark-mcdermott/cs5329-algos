@@ -1,3 +1,8 @@
+// Mark McDermott
+// CS5329
+// Project 1
+// 2/4/22
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.jfree.chart.ChartPanel;
@@ -36,10 +41,11 @@ public class Main {
     static long lineCount;
     static int[] randomNValuesForArrays = new int[numArrays];
     static int[][] unsortedIntArrays = new int[numArrays][];
-    static int horizontalPadding = 5;
+    static int horizontalPaddingSmall = 5;
+    static int horizontalPaddingLarge = 685;
     static int verticalPaddingSmall = 100;
-    static int verticalPaddingLarge = 400;
-
+    static int verticalPaddingMedium = 200;
+    static int verticalPaddingLarge = 675;
 
     public static void main(String[] args) {
 
@@ -285,16 +291,17 @@ public class Main {
         leftPanel.setLayout(boxLayout1);
         JLabel label1 = new JLabel("Insertion Sort");
         leftPanel.add(label1);
-        label1.setPreferredSize(new Dimension(horizontalPadding, verticalPaddingSmall));
+        label1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingSmall));
         String text1 = sortedAndUnsortedArrsToString(unsortedIntArrays, insertionSortedArrays);
         JTextArea textArea1 = new JTextArea(text1);
+        textArea1.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
         leftPanel.add(textArea1);
         String[][] tableData1 = getTableData(tableHeaders, randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
         JTable jTable1 = new JTable(tableData1, tableHeaders);
-        jTable1.setPreferredSize(new Dimension(horizontalPadding, verticalPaddingLarge));
+        jTable1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
         leftPanel.add(jTable1);
         XYDataset lineGraphData1 = createLineGraphData(randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
-        LineChart lineChart1 = new LineChart("Project 1 Part A Insertion Sort Graph", "Theoretic total cost T(N), Actual Count vs. N value", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData1);
+        LineChart lineChart1 = new LineChart("Project 1 Part A Insertion Sort Graph", "", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData1);
         ChartPanel chartPanel1 = lineChart1.getChartPanel();
         leftPanel.add(chartPanel1);
         mainPanel.add(leftPanel, gbc);
@@ -311,17 +318,18 @@ public class Main {
         JLabel rightTitleLabel = new JLabel(" ");
         rightPanel.add(rightTitleLabel);
         JLabel label2 = new JLabel("Merge Sort");
-        label2.setPreferredSize(new Dimension(horizontalPadding, verticalPaddingSmall));
+        label2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingSmall));
         rightPanel.add(label2);
         String text2 = sortedAndUnsortedArrsToString(unsortedIntArrays, mergeSortedArrays);
         JTextArea textArea2 = new JTextArea(text2);
+        textArea2.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
         rightPanel.add(textArea2);
         String[][] tableData2 = getTableData(tableHeaders, randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
         JTable jTable2 = new JTable(tableData2, tableHeaders);
-        jTable2.setPreferredSize(new Dimension(horizontalPadding, verticalPaddingLarge));
+        jTable2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
         rightPanel.add(jTable2);
         XYDataset lineGraphData2 = createLineGraphData(randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
-        LineChart lineChart2 = new LineChart("Project 1 Part A Insertion Sort Graph", "Theoretic total cost T(N), Actual Count vs. N value", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData2);
+        LineChart lineChart2 = new LineChart("Project 1 Part A Merge Sort Graph", "", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData2);
         ChartPanel chartPanel2 = lineChart2.getChartPanel();
         rightPanel.add(chartPanel2);
         mainPanel.add(rightPanel, gbc);
