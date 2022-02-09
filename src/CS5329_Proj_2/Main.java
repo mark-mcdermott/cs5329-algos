@@ -63,15 +63,7 @@ public class Main {
         MaxSubarrayActualAndWorstObj maxSubarrayRecursiveResults = getMaxSubarrayActualAndWorstRecursive(unsortedIntArraysCopy1);
         MaxSubarrayActualAndWorstObj maxSubarrayBruteForceResults = getMaxSubarrayActualAndWorstBruteForce(unsortedIntArraysCopy2);
 
-        outputMaxSubarrayResults(maxSubarrayRecursiveResults,maxSubarrayBruteForceResults);
-
-        int z=0;
-        if (z==0) {
-            int x=1;
-        }
-
-        // outputTheResults(insertionSortResults, mergeSortResults, outputToScreenOrPdf);
-
+        outputMaxSubarrayResults(maxSubarrayRecursiveResults,maxSubarrayBruteForceResults,outputToScreenOrPdf);
     }
 
     public static int[][] copy2DArray(int[][] arr) {
@@ -103,17 +95,17 @@ public class Main {
         return new MaxSubarrayActualAndWorstObj(maxSubarrays,actualCosts,worstCases);
     }
 
-        public static MaxSubarrayActualAndWorstObj getMaxSubarrayActualAndWorstBruteForce(int[][] arrays) {
+    public static MaxSubarrayActualAndWorstObj getMaxSubarrayActualAndWorstBruteForce(int[][] arrays) {
         SubarrayTuple[] maxSubarrays = new SubarrayTuple[numArrays];
         long[] actualCosts = new long[numArrays];
         int[] worstCases = new int[numArrays];
         for (int i=0; i<arrays.length; i++) {
             int n = arrays[i].length;
             lineCount=0;
-            SubarrayTuple maxSubarray = maxSubarrayRecursive(arrays[i],0, arrays[i].length - 1);
+            SubarrayTuple maxSubarray = maxSubarrayBruteForce(arrays[i],0, arrays[i].length - 1);
             maxSubarrays[i] = maxSubarray;
             actualCosts[i] = lineCount;
-            worstCases[i] = (int) nLgN(n);
+            worstCases[i] = n * n;
         }
         return new MaxSubarrayActualAndWorstObj(maxSubarrays,actualCosts,worstCases);
     }
@@ -148,7 +140,6 @@ public class Main {
 
     static void outputTheResults(SortedActualAndWorstObj insertionSortResults,
                                  SortedActualAndWorstObj mergeSortResults, String outputType) {
-
         if (outputType.equals("screen")) {
             printResultsToScreen(insertionSortResults, mergeSortResults);
         } else if (outputType.equals("pdf")) {
@@ -157,7 +148,16 @@ public class Main {
 
     }
 
-    static void outputMaxSubarrayResults(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstRecursiveObj,MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstBruteForceObj) {
+    static void outputMaxSubarrayResults(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstRecursiveObj,MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstBruteForceObj, String outputType) {
+        if (outputType.equals("screen")) {
+            outputMaxSubarrayResultsToScreen(maxSubarrayActualAndWorstRecursiveObj, maxSubarrayActualAndWorstBruteForceObj);
+        } else if (outputType.equals("pdf")) {
+            printMaxSubarrayResultsToPDF(maxSubarrayActualAndWorstRecursiveObj, maxSubarrayActualAndWorstRecursiveObj);
+        }
+
+    }
+
+    static void outputMaxSubarrayResultsToScreen(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstRecursiveObj,MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstBruteForceObj) {
         Frame frame = new JFrame("CS5329 Project 2");
         JPanel jPanel = createJPanelOutputMaxSubarray(maxSubarrayActualAndWorstRecursiveObj,maxSubarrayActualAndWorstBruteForceObj);
         jPanel.setPreferredSize(new Dimension(2000, 3000));
@@ -177,6 +177,11 @@ public class Main {
 
     static void printResultsToPDF(SortedActualAndWorstObj insertionSortResults, SortedActualAndWorstObj mergeSortResults) {
         JPanel jPanel = createJPanelOutput(insertionSortResults, mergeSortResults);
+        new CreatePDF(jPanel, pdfOutputPathAndFile);
+    }
+
+    static void printMaxSubarrayResultsToPDF(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstRecursiveObj,MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstBruteForceObj) {
+        JPanel jPanel = createJPanelOutputMaxSubarray(maxSubarrayActualAndWorstRecursiveObj,maxSubarrayActualAndWorstBruteForceObj);
         new CreatePDF(jPanel, pdfOutputPathAndFile);
     }
 
@@ -338,42 +343,29 @@ public class Main {
 
 
         public static SubarrayTuple maxSubarrayBruteForce(int list[], int low, int high) {
-
+        int maxSubarraySum = list[low];
+        int maxSubarrayLow = low;
+        int maxSubarrayHigh = low;
         int arrLen = high - low + 1;
-        int maxSum = low;
         for (int i=low; i<arrLen; i++) {
+            lineCount++;
             int curSum = list[i];
-            if (curSum > maxSum) {
-                maxSum = curSum;
+            if (curSum > maxSubarraySum) {
+                maxSubarraySum = curSum;
+                maxSubarrayLow = i;
+                maxSubarrayHigh = i;
             }
             for (int j=i+1; j<arrLen; j++) {
+                lineCount++;
                 curSum = curSum + list[j];
-                if (curSum > maxSum) {
-                    maxSum = curSum;
+                if (curSum > maxSubarraySum) {
+                    maxSubarraySum = curSum;
+                    maxSubarrayLow = i;
+                    maxSubarrayHigh = j;
                 }
             }
         }
-
-        int mid, leftSum, rightSum, crossSum;
-        SubarrayTuple leftLowLeftHighLeftSum, rightLowRightHighRightSum, crossLowCrossHighCrossSum;
-        if (high == low) {
-            lineCount++; return new SubarrayTuple(low, high, list[low]);
-        } else {
-            lineCount++; mid = (int) Math.floor((low + high)/2);
-            leftLowLeftHighLeftSum = maxSubarrayRecursive(list,low,mid);
-            rightLowRightHighRightSum = maxSubarrayRecursive(list,mid+1,high);
-            crossLowCrossHighCrossSum = maxCrossingSubarray(list,low,mid,high);
-            leftSum = leftLowLeftHighLeftSum.getSum();
-            rightSum = rightLowRightHighRightSum.getSum();
-            crossSum = crossLowCrossHighCrossSum.getSum();
-            if (leftSum >= rightSum && leftSum >= crossSum) {
-                return leftLowLeftHighLeftSum;
-            } else if (rightSum >= leftSum && rightSum >= crossSum) {
-                return rightLowRightHighRightSum;
-            } else {
-                return crossLowCrossHighCrossSum;
-            }
-        }
+        return new SubarrayTuple(maxSubarrayLow,maxSubarrayHigh,maxSubarraySum);
     }
 
 
@@ -463,7 +455,7 @@ public class Main {
         GridBagConstraints gbc = new GridBagConstraints();
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.setBackground(Color.WHITE);
-        JTextArea containerTitle = new JTextArea("Mark McDermott\nCS5329\nProject 1\n1/31/22");
+        JTextArea containerTitle = new JTextArea("Mark McDermott\nCS5329\nProject 2\n2/8/22");
         containerPanel.add(containerTitle, BorderLayout.NORTH);
         JPanel mainPanel = new JPanel();
         containerPanel.add(mainPanel);
@@ -486,8 +478,8 @@ public class Main {
         JTextArea textArea1 = new JTextArea(text1);
         textArea1.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
         leftPanel.add(textArea1);
-        String[][] tableData1 = getTableData(tableHeaders, randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
-        JTable jTable1 = new JTable(tableData1, tableHeaders);
+        String[][] tableData1 = getTableData(new String[] {"","","","n", "Actual", "Average Case","","",""}, randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
+        JTable jTable1 = new JTable(tableData1, new String[] {"","","","n", "Actual", "Average Case","","",""});
         jTable1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
         leftPanel.add(jTable1);
         XYDataset lineGraphData1 = createLineGraphData(randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
@@ -514,8 +506,8 @@ public class Main {
         JTextArea textArea2 = new JTextArea(text2);
         textArea2.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
         rightPanel.add(textArea2);
-        String[][] tableData2 = getTableData(tableHeaders, randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
-        JTable jTable2 = new JTable(tableData2, tableHeaders);
+        String[][] tableData2 = getTableData(new String[] {"","","","n", "Actual", "Worst Case","","",""}, randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
+        JTable jTable2 = new JTable(tableData2, new String[] {"","","","n", "Actual", "Worst Case","","",""});
         jTable2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
         rightPanel.add(jTable2);
         XYDataset lineGraphData2 = createLineGraphData(randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
@@ -539,7 +531,7 @@ public class Main {
         GridBagConstraints gbc = new GridBagConstraints();
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.setBackground(Color.WHITE);
-        JTextArea containerTitle = new JTextArea("Mark McDermott\nCS5329\nProject 1\n1/31/22");
+        JTextArea containerTitle = new JTextArea("Mark McDermott\nCS5329\nProject 2\n2/8/22");
         containerPanel.add(containerTitle, BorderLayout.NORTH);
         JPanel mainPanel = new JPanel();
         containerPanel.add(mainPanel);
@@ -562,8 +554,8 @@ public class Main {
         JTextArea textArea1 = new JTextArea(text1);
         textArea1.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
         leftPanel.add(textArea1);
-        String[][] tableData1 = getTableData(tableHeaders, randomNValuesForArrays, insertionActualCostsRecursive, insertionWorstCasesRecursive);
-        JTable jTable1 = new JTable(tableData1, tableHeaders);
+        String[][] tableData1 = getTableData(new String[] { "","","","n", "Actual", "Average Case","","","" }, randomNValuesForArrays, insertionActualCostsRecursive, insertionWorstCasesRecursive);
+        JTable jTable1 = new JTable(tableData1, new String[] { "","","","n", "Actual", "Average Case","","","" });
         jTable1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
         leftPanel.add(jTable1);
         XYDataset lineGraphData1 = createLineGraphData(randomNValuesForArrays, insertionActualCostsRecursive, insertionWorstCasesRecursive);
@@ -584,16 +576,16 @@ public class Main {
         JLabel rightTitleLabel = new JLabel(" ");
         rightPanel.add(rightTitleLabel);
         JLabel label2 = new JLabel("Maximum Subarray (Brute Force)");
-        leftPanel.add(label2);
+        rightPanel.add(label2);
         label2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingSmall));
         String text2 = origArrayAndMaxSubarrayIntervalToString(unsortedIntArrays, subarrayTuplesBruteForce);
         JTextArea textArea2 = new JTextArea(text2);
         textArea2.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
-        leftPanel.add(textArea2);
-        String[][] tableData2 = getTableData(tableHeaders, randomNValuesForArrays, insertionActualCostsBruteForce, insertionWorstCasesBruteForce);
-        JTable jTable2 = new JTable(tableData2, tableHeaders);
+        rightPanel.add(textArea2);
+        String[][] tableData2 = getTableData(new String[] { "","","","n", "Actual", "Worst Case","","","" }, randomNValuesForArrays, insertionActualCostsBruteForce, insertionWorstCasesBruteForce);
+        JTable jTable2 = new JTable(tableData2, new String[] { "","","","n", "Actual", "Worst Case","","","" });
         jTable1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
-        leftPanel.add(jTable2);
+        rightPanel.add(jTable2);
         XYDataset lineGraphData2 = createLineGraphData(randomNValuesForArrays, insertionActualCostsBruteForce, insertionWorstCasesBruteForce);
         LineChart lineChart2 = new LineChart("Project 2", "", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData2);
         ChartPanel chartPanel2 = lineChart2.getChartPanel();
