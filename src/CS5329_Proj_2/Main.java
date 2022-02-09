@@ -1,7 +1,7 @@
 package CS5329_Proj_2;// Mark McDermott
 // CS5329
-// Project 1
-// 2/4/22
+// Project 2
+// 2/7/22
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -30,14 +30,14 @@ import static java.lang.String.valueOf;
 public class Main {
 
     // init vars
-    static String pdfOutputPathAndFile = "/Users/markmcdermott/Desktop/Project_1.pdf";
+    static String pdfOutputPathAndFile = "/Users/markmcdermott/Desktop/Project_2.pdf";
     static String[] tableHeaders = {"","","","n", "Actual", "Worst Case","","",""}; // blank columns here just for formatting
-    static String outputToScreenOrPdf = "pdf"; // must be "screen" or "pdf"
+    static String outputToScreenOrPdf = "screen"; // must be "screen" or "pdf"
     static int numArrays = 10;
     static int minNValue = 1;
-    static int maxNValue = 30;
-    static int minElemValue = 1;
-    static int maxElemValue = 30;
+    static int maxNValue = 20;
+    static int minElemValue = -99;
+    static int maxElemValue = 99;
     static long lineCount;
     static int[] randomNValuesForArrays = new int[numArrays];
     static int[][] unsortedIntArrays = new int[numArrays][];
@@ -53,17 +53,22 @@ public class Main {
 
         // get unsorted int arrays
         for (int i = 0; i < numArrays; i++) {
-            unsortedIntArrays[i] = new int[randomNValuesForArrays[i]];
+             unsortedIntArrays[i] = new int[randomNValuesForArrays[i]];
         }
         fillArraysWithRandomNums(unsortedIntArrays, minElemValue, maxElemValue);
 
         int[][] unsortedIntArraysCopy1 = copy2DArray(unsortedIntArrays);
-        int[][] unsortedIntArraysCopy2 = copy2DArray(unsortedIntArrays);
 
-        SortedActualAndWorstObj insertionSortResults = getSortedActualAndWorst("insertionSort", unsortedIntArraysCopy1);
-        SortedActualAndWorstObj mergeSortResults = getSortedActualAndWorst("mergeSort", unsortedIntArraysCopy2);
+        MaxSubarrayActualAndWorstObj maxSubarrayResults = getMaxSubarrayActualAndWorst(unsortedIntArraysCopy1);
 
-        outputTheResults(insertionSortResults, mergeSortResults, outputToScreenOrPdf);
+        outputMaxSubarrayResults(maxSubarrayResults);
+
+        int z=0;
+        if (z==0) {
+            int x=1;
+        }
+
+        // outputTheResults(insertionSortResults, mergeSortResults, outputToScreenOrPdf);
 
     }
 
@@ -77,9 +82,28 @@ public class Main {
 
     public static SortedActualAndWorstObj getSortedActualAndWorst(String sortType, int[][] arrays) {
         SortedActualAndWorstObj sortedActualAndWorst = getSortedArraysAndActualCost(sortType, arrays); // gets sorted arrays & actual costs
-        sortedActualAndWorst.setWorstCases(getWorstCases(sortType, randomNValuesForArrays));            // get worst cases
+        sortedActualAndWorst.setWorstCases(getWorstCases(sortType, randomNValuesForArrays));           // get worst cases
         return sortedActualAndWorst;
     }
+
+    public static MaxSubarrayActualAndWorstObj getMaxSubarrayActualAndWorst(int[][] arrays) {
+        SubarrayTuple[] maxSubarrays = new SubarrayTuple[numArrays];
+        long[] actualCosts = new long[numArrays];
+        int[] worstCases = new int[numArrays];
+        for (int i=0; i<arrays.length; i++) {
+            int n = arrays[i].length;
+            lineCount=0;
+            SubarrayTuple maxSubarray = maxSubarray(arrays[i],0, arrays[i].length - 1);
+            maxSubarrays[i] = maxSubarray;
+            actualCosts[i] = lineCount;
+            worstCases[i] = (int) nLgN(n);
+        }
+        return new MaxSubarrayActualAndWorstObj(maxSubarrays,actualCosts,worstCases);
+    }
+
+
+
+
 
 
     public static int[] getWorstCases(String sortType, int[] randomNValuesForArrays) {
@@ -97,6 +121,10 @@ public class Main {
         return worstCases;
     }
 
+    public static double nLgN(int n) {
+        return n * lg(n);
+    }
+
     private static double lg(int num) {
         return Math.log(num) / Math.log(2); // binary log (log base 2)
     }
@@ -110,6 +138,15 @@ public class Main {
             printResultsToPDF(insertionSortResults, mergeSortResults);
         }
 
+    }
+
+    static void outputMaxSubarrayResults(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstObj) {
+        Frame frame = new JFrame("CS5329 Project 2");
+        JPanel jPanel = createJPanelOutputMaxSubarray(maxSubarrayActualAndWorstObj);
+        jPanel.setPreferredSize(new Dimension(2000, 3000));
+        frame.add(jPanel);
+        frame.setSize(2000, 3000);
+        frame.setVisible(true);
     }
 
     static void printResultsToScreen(SortedActualAndWorstObj insertionSortResults, SortedActualAndWorstObj mergeSortResults) {
@@ -133,6 +170,13 @@ public class Main {
         }
     }
 
+    static void fillArrWithRandomPosOrNegNums(int[] arr, int min, int max) {
+        for (int i = 0; i < arr.length; i++) {
+            Random rand = new Random();
+            arr[i] = rand.nextInt(max + 1 - min) + min; // min to max, inclusive
+        }
+    }
+
     static void fillArraysWithRandomNums(int[][] arrs, int min, int max) {
         for (int i = 0; i < arrs.length; i++) {
             fillArrWithRandomNums(arrs[i], minElemValue, maxElemValue);
@@ -144,13 +188,17 @@ public class Main {
         long[] actualCosts = new long[numArrays];
         for (int i = 0; i < numArrays; i++) {
             int[] thisUnsortedArray = arrays[i];
-            if (sortType.equals("insertionSort")) {
+            if (sortType.equals("maxSubarray")) {
                 lineCount = 0;
-                insertionSort(thisUnsortedArray);
-            } else if (sortType.equals("mergeSort")) {
-                lineCount = 0;
-                mergeSort(thisUnsortedArray, 0, thisUnsortedArray.length - 1);
+
             }
+//            if (sortType.equals("insertionSort")) {
+//                lineCount = 0;
+//                insertionSort(thisUnsortedArray);
+//            } else if (sortType.equals("mergeSort")) {
+//                lineCount = 0;
+//                mergeSort(thisUnsortedArray, 0, thisUnsortedArray.length - 1);
+//            }
             int[] thisSortedArray = thisUnsortedArray;
             sortedArrays[i] = thisSortedArray;
             actualCosts[i] = lineCount;
@@ -221,6 +269,55 @@ public class Main {
         }
     }
 
+    public static SubarrayTuple maxCrossingSubarray(int list[], int low, int mid, int high) {
+        lineCount++;
+        int leftSum = Integer.MIN_VALUE;
+        int rightSum;
+        Integer maxLeft = null;
+        Integer maxRight = null;
+        int sum = 0;
+        for (int i=mid; i>=low; i--) {
+            sum = sum + list[i];
+            if (sum > leftSum) {
+                leftSum = sum;
+                maxLeft = i;
+            }
+        }
+        rightSum = Integer.MIN_VALUE;
+        sum = 0;
+        for (int j=mid+1; j<=high; j++) {
+            sum = sum+list[j];
+            if (sum > rightSum) {
+                rightSum = sum;
+                maxRight = j;
+            }
+        }
+        return new SubarrayTuple(maxLeft,maxRight,leftSum+rightSum);
+    }
+
+    public static SubarrayTuple maxSubarray(int list[], int low, int high) {
+        int mid, leftSum, rightSum, crossSum;
+        SubarrayTuple leftLowLeftHighLeftSum, rightLowRightHighRightSum, crossLowCrossHighCrossSum;
+        if (high == low) {
+            lineCount++; return new SubarrayTuple(low, high, list[low]);
+        } else {
+            lineCount++; mid = (int) Math.floor((low + high)/2);
+            leftLowLeftHighLeftSum = maxSubarray(list,low,mid);
+            rightLowRightHighRightSum = maxSubarray(list,mid+1,high);
+            crossLowCrossHighCrossSum = maxCrossingSubarray(list,low,mid,high);
+            leftSum = leftLowLeftHighLeftSum.getSum();
+            rightSum = rightLowRightHighRightSum.getSum();
+            crossSum = crossLowCrossHighCrossSum.getSum();
+            if (leftSum >= rightSum && leftSum >= crossSum) {
+                return leftLowLeftHighLeftSum;
+            } else if (rightSum >= leftSum && rightSum >= crossSum) {
+                return rightLowRightHighRightSum;
+            } else {
+                return crossLowCrossHighCrossSum;
+            }
+        }
+    }
+
     // Data to be displayed in the JTable
     static String[][] getTableData(String[] tableHeaders, int[] randomNValuesForArrays, long[] actualCosts, int[] worstCaseArr) {
         String[][] tableData = new String[numArrays][];
@@ -245,6 +342,37 @@ public class Main {
             output = output + Arrays.toString(sorted) + "\n\n";
         }
         return output;
+    }
+
+    static String origArrayAndMaxSubarrayIntervalToString(int[][] unsortedArrs, SubarrayTuple[] subarrayTuples) {
+        String output = "";
+        for (int i = 0; i < numArrays; i++) {
+            int[] unsorted = unsortedArrs[i];
+            SubarrayTuple subarrayTuple = subarrayTuples[i];
+            int[] maxSubarrayIntervalArr = getMaxSubarrayIntervalArr(unsorted,subarrayTuple);
+            int sum = subarrayTuple.sum;
+            int testNum = i + 1;
+            output = output + "Test " + testNum + ":\n";
+            output = output + "Unsorted: ";
+            output = output + Arrays.toString(unsorted) + "\n";
+            output = output + "Max Subarray: ";
+            output = output + Arrays.toString(maxSubarrayIntervalArr) + "\n";
+            output = output + "Max Subarray Sum: ";
+            output = output + sum + "\n\n";
+        }
+        return output;
+    }
+
+    static int[] getMaxSubarrayIntervalArr(int[] unsortedArr, SubarrayTuple subarrayTuple) {
+        int low = subarrayTuple.getLow();
+        int high = subarrayTuple.getHigh();
+        int maxSubarrayIntervalArrLen = high - low + 1;
+        int[] maxSubarrayIntervalArr = new int[maxSubarrayIntervalArrLen];
+        for (int i=0; i<maxSubarrayIntervalArrLen; i++) {
+            int current = low + i;
+            maxSubarrayIntervalArr[i] = unsortedArr[current];
+        }
+        return maxSubarrayIntervalArr;
     }
 
     private static XYDataset createLineGraphData(int[] randomNValuesForArrays, long[] actualArr, int[] worstCaseArr) {
@@ -337,6 +465,112 @@ public class Main {
         return containerPanel;
 
     }
+
+        static JPanel createJPanelOutputMaxSubarray(MaxSubarrayActualAndWorstObj maxSubarrayActualAndWorstObj) {
+        SubarrayTuple[] subarrayTuples = maxSubarrayActualAndWorstObj.getSubarrayTuples();
+        long[] insertionActualCosts = maxSubarrayActualAndWorstObj.getActualCosts();
+        int[] insertionWorstCases = maxSubarrayActualAndWorstObj.getAverageCases();
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.setBackground(Color.WHITE);
+        JTextArea containerTitle = new JTextArea("Mark McDermott\nCS5329\nProject 1\n1/31/22");
+        containerPanel.add(containerTitle, BorderLayout.NORTH);
+        JPanel mainPanel = new JPanel();
+        containerPanel.add(mainPanel);
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setLayout(new GridLayout());
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.ipadx = 50;
+        gbc.ipady = 50;
+        JPanel leftPanel = new JPanel();
+        leftPanel.setOpaque(true);
+        leftPanel.setBackground(Color.WHITE);
+        BoxLayout boxLayout1 = new BoxLayout(leftPanel, BoxLayout.PAGE_AXIS);
+        leftPanel.setLayout(boxLayout1);
+        JLabel label1 = new JLabel("Maximum Subarray Algo");
+        leftPanel.add(label1);
+        label1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingSmall));
+        String text1 = origArrayAndMaxSubarrayIntervalToString(unsortedIntArrays, subarrayTuples);
+        JTextArea textArea1 = new JTextArea(text1);
+        textArea1.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
+        leftPanel.add(textArea1);
+        String[][] tableData1 = getTableData(tableHeaders, randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
+        JTable jTable1 = new JTable(tableData1, tableHeaders);
+        jTable1.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
+        leftPanel.add(jTable1);
+        XYDataset lineGraphData1 = createLineGraphData(randomNValuesForArrays, insertionActualCosts, insertionWorstCases);
+        LineChart lineChart1 = new LineChart("Project 2", "", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData1);
+        ChartPanel chartPanel1 = lineChart1.getChartPanel();
+        leftPanel.add(chartPanel1);
+        mainPanel.add(leftPanel, gbc);
+
+//        gbc.gridx = 1;
+//        gbc.gridy = 0;
+//        gbc.ipadx = 50;
+//        gbc.ipady = 50;
+//        JPanel rightPanel = new JPanel();
+//        rightPanel.setOpaque(true);
+//        rightPanel.setBackground(Color.WHITE);
+//        BoxLayout boxLayout2 = new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS);
+//        rightPanel.setLayout(boxLayout2);
+//        JLabel rightTitleLabel = new JLabel(" ");
+//        rightPanel.add(rightTitleLabel);
+//        JLabel label2 = new JLabel("Merge Sort");
+//        label2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingSmall));
+//        rightPanel.add(label2);
+//        String text2 = sortedAndUnsortedArrsToString(unsortedIntArrays, mergeSortedArrays);
+//        JTextArea textArea2 = new JTextArea(text2);
+//        textArea2.setPreferredSize(new Dimension(horizontalPaddingLarge, verticalPaddingLarge));
+//        rightPanel.add(textArea2);
+//        String[][] tableData2 = getTableData(tableHeaders, randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
+//        JTable jTable2 = new JTable(tableData2, tableHeaders);
+//        jTable2.setPreferredSize(new Dimension(horizontalPaddingSmall, verticalPaddingMedium));
+//        rightPanel.add(jTable2);
+//        XYDataset lineGraphData2 = createLineGraphData(randomNValuesForArrays, mergeActualCosts, mergeWorstCases);
+//        LineChart lineChart2 = new LineChart("Project 1 Part A Merge Sort Graph", "", "N value", "Theoretic total cost T(N) and Actual Count", lineGraphData2);
+//        ChartPanel chartPanel2 = lineChart2.getChartPanel();
+//        rightPanel.add(chartPanel2);
+//        mainPanel.add(rightPanel, gbc);
+
+        return containerPanel;
+
+    }
+
+}
+
+class MaxSubarrayActualAndWorstObj {
+    SubarrayTuple[] subarrayTuples;
+    long[] actualCosts;
+    int[] averageCases;
+
+    public MaxSubarrayActualAndWorstObj(SubarrayTuple[] subArrayTuples, long[] actualCosts, int[] averageCases) {
+        this.subarrayTuples = subArrayTuples;
+        this.actualCosts = actualCosts;
+        this.averageCases = averageCases;
+    }
+
+    public MaxSubarrayActualAndWorstObj(SubarrayTuple[] subArrayTuples, long[] actualCosts) {
+        this.subarrayTuples = subArrayTuples;
+        this.actualCosts = actualCosts;
+    }
+
+
+
+    public long[] getActualCosts() {
+        return actualCosts;
+    }
+
+    public int[] getAverageCases() {
+        return averageCases;
+    }
+
+    public SubarrayTuple[] getSubarrayTuples() {
+        return subarrayTuples;
+    }
+
 }
 
 class SortedActualAndWorstObj {
@@ -466,4 +700,39 @@ class LineChart extends ApplicationFrame {
    public ChartPanel getChartPanel() {
       return chartPanel;
    }
+}
+
+class SubarrayTuple {
+    int low;
+    int high;
+    int sum;
+    int oneBasedLow;
+    int oneBasedHigh;
+    public SubarrayTuple(int low, int high, int sum) {
+        this.low = low;
+        this.high = high;
+        this.sum = sum;
+        this.oneBasedHigh = low + 1;
+        this.oneBasedHigh = high + 1;
+    }
+    public int getHigh() {
+        return high;
+    }
+
+    public int getLow() {
+        return low;
+    }
+
+    public int getOneBasedHigh() {
+        return oneBasedHigh;
+    }
+
+    public int getOneBasedLow() {
+        return oneBasedLow;
+    }
+
+    public int getSum() {
+        return sum;
+    }
+
 }
